@@ -1,0 +1,4 @@
+principal(){
+    inteiro &a, &b;
+    caractere &nome[30];
+}
