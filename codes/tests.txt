@@ -1,4 +1,11 @@
 principal(){
     inteiro &a, &b;
     caractere &nome[30];
+    funcao fsoma(&a,&b);
+}
+
+funcao fsoma(inteiro &c, inteiro &d){
+    inteiro &e;
+    &e=&c+&d;
+    escrita(&e);
 }
