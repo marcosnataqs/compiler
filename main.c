@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "resources/memory.c"
 #include "resources/utils.c"
 #include "resources/logs.c"
+#include "resources/symbtab.c"
 #include "plataform/lexic.c"
 
 int main(void) 

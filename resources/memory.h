@@ -1,0 +1,1 @@
+void control_memory(size_t size);

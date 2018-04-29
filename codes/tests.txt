@@ -1,5 +1,5 @@
 principal(){
-    inteiro &a;
+    inteiro &a,&b;
     caractere &nome[30];
     decimal &h[6.2];
     funcao fsoma(&a,&b);

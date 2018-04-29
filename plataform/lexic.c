@@ -55,6 +55,9 @@ void verify_principal() {
         control_memory(sizeof(word));
     }
 
+    // String final "\0"
+    word[mem-1] = 00;
+
     if(strncmp(word, reserved_words[0], strlen(reserved_words[0])) == 0) // principal
     {
         scope = malloc(strlen(reserved_words[0]) * sizeof(char));
@@ -87,6 +90,9 @@ void verify_inteiro() {
         word = (char *) realloc(word, mem * sizeof(char));
         control_memory(sizeof(word));
     }
+
+    // String final "\0"
+    word[mem-1] = 00;
 
     if(strncmp(word, reserved_words[7], strlen(reserved_words[7])) == 0) // inteiro
     {
@@ -129,13 +135,16 @@ void verify_decimal() {
         control_memory(sizeof(word));
     }
 
+    // String final "\0"
+    word[mem-1] = 00;
+
     if(strncmp(word, reserved_words[9], strlen(reserved_words[9])) == 0) // decimal
     {
         log_success("decimal type");
         next_wout_space();
         if ((int)file_array[char_index] == 38) // &
         {
-            
+            validate_variable(DECIMAL);
         }
         else
         {
@@ -170,13 +179,16 @@ void verify_caractere() {
         control_memory(sizeof(word));
     }
 
+    // String final "\0"
+    word[mem-1] = 00;
+
     if(strncmp(word, reserved_words[8], strlen(reserved_words[8])) == 0) // caractere
     {
         log_success("caractere type");
         next_wout_space();
         if ((int)file_array[char_index] == 38) // &
         {
-            
+            validate_variable(CARACTERE);
         }
         else
         {
@@ -201,12 +213,12 @@ void validate_variable(int type) {
 
     if (type == INTEIRO) {
         next_wout_space();
-        if ((int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122)
+        if ((int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122) // a..z
         {
             word[mem-1] = file_array[char_index-1]; // &
             word[mem] = file_array[char_index];
             next_wout_space();
-            while ((int)file_array[char_index] != 59) // ;
+            while ((int)file_array[char_index] != 59 && (int)file_array[char_index] != 44) // ; ou ,
             {
                 mem++;
                 word = (char *) realloc(word, mem * sizeof(char));
@@ -227,10 +239,28 @@ void validate_variable(int type) {
                     log_error("Variavel: Caractere Invalido");
                     exit(0);
                 }
+                
                 next_wout_space();
             }
 
-            save_to_symbtab(word, "inteiro", "0", scope);
+            // String final "\0"
+            word[mem+1] = 00;
+
+            save_to_symbtab(word, "inteiro", NULL, scope);  
+
+            if ((int)file_array[char_index] == 44) // ,
+            {
+                next_wout_space();
+                if ((int)file_array[char_index] == 38) // &
+                {
+                    validate_variable(INTEIRO);
+                }
+                else
+                {
+                    log_error("Declaracao de Variavel");
+                    exit(0);
+                }
+            }
         }
         else
         {
