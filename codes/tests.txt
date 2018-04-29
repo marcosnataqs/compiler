@@ -1,11 +1,12 @@
 principal(){
-    inteiro &a, &b;
+    inteiro &a;
     caractere &nome[30];
+    decimal &h[6.2];
     funcao fsoma(&a,&b);
 }
 
-funcao fsoma(inteiro &c, inteiro &d){
+funcao fsoma(inteiro &c, inteiro &f){
     inteiro &e;
-    &e=&c+&d;
+    &e=&c+&f;
     escrita(&e);
 }

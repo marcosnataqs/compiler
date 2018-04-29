@@ -1,16 +1,12 @@
-void verify_word(char *word);
+void verify_principal();
 
-void control_memory(size_t size);
+void verify_inteiro();
 
-struct SymbolTables
-{
-    char *token;
-    char *type;
-    char *value;
-    char *scope;
-};
+void verify_decimal();
 
-struct SymbolTables *SymbolTable;
+void verify_caractere();
+
+void validate_variable(int type);
 
 extern const char *reserved_words[];
 
@@ -21,5 +17,7 @@ extern int char_index;
 extern int char_count;
 
 extern char *scope;
+
+extern int scope_state;
 
 extern int line_index;

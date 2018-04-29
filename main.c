@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "plataform/lexic.c"
 #include "resources/utils.c"
+#include "resources/logs.c"
+#include "plataform/lexic.c"
 
 int main(void) 
 {
@@ -12,7 +13,7 @@ int main(void)
     /*Lexic Parsing*/
     lexic();
 
-    printf("\nAllocated Memory: %zu bytes\n\n", allocated);
+    printf("\n\nAllocated Memory: %zu bytes\n\n", allocated);
 
     return 0;
 }
