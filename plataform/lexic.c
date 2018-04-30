@@ -33,6 +33,9 @@ void lexic() {
             case 99: // c
                 verify_caractere();
                 break;
+            case 102: // f
+                //TODO: Validar função
+                break;
         }
     }
 };
@@ -211,61 +214,110 @@ void validate_variable(int type) {
     word = malloc((mem*2) * sizeof(char));
     control_memory(sizeof(word));
 
-    if (type == INTEIRO) {
+    next_wout_space();
+    if ((int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122) // a..z
+    {
+        word[mem-1] = file_array[char_index-1]; // &
+        word[mem] = file_array[char_index];
         next_wout_space();
-        if ((int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122) // a..z
+        while ((int)file_array[char_index] != 59 
+                && (int)file_array[char_index] != 44 && (int)file_array[char_index] != 91) // ; ou , ou [
         {
-            word[mem-1] = file_array[char_index-1]; // &
-            word[mem] = file_array[char_index];
+            mem++;
+            word = (char *) realloc(word, mem * sizeof(char));
+            control_memory(sizeof(word));
+
+            if (
+                (int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122 // a..z
+                ||
+                (int)file_array[char_index] >= 65 && (int)file_array[char_index] <= 90 // A..Z
+                ||
+                (int)file_array[char_index] >= 48 && (int)file_array[char_index] <= 57 // 0..9
+                )
+            {
+                word[mem] = file_array[char_index];
+            }
+            else
+            {
+                log_error("Variavel: Caractere Invalido");
+                exit(0);
+            }
+            
             next_wout_space();
-            while ((int)file_array[char_index] != 59 && (int)file_array[char_index] != 44) // ; ou ,
-            {
-                mem++;
-                word = (char *) realloc(word, mem * sizeof(char));
-                control_memory(sizeof(word));
+        }
 
-                if (
-                    (int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122 // a..z
-                    ||
-                    (int)file_array[char_index] >= 65 && (int)file_array[char_index] <= 90 // A..Z
-                    ||
-                    (int)file_array[char_index] >= 48 && (int)file_array[char_index] <= 57 // 0..9
-                    )
-                {
-                    word[mem] = file_array[char_index];
-                }
-                else
-                {
-                    log_error("Variavel: Caractere Invalido");
-                    exit(0);
-                }
-                
+        // String final "\0"
+        word[mem+1] = 00;
+
+        if (type == CARACTERE || type == DECIMAL) {
+            check_data_length(type);
+        }
+
+        save_to_symbtab(word, type, NULL, scope);  
+
+        if ((int)file_array[char_index] == 44) // ,
+        {
+            next_wout_space();
+            if ((int)file_array[char_index] == 38) // &
+            {
+                validate_variable(INTEIRO);
+            }
+            else
+            {
+                log_error("Declaracao de Variavel");
+                exit(0);
+            }
+        }
+        else if ((int)file_array[char_index] != 59) // ;
+        {
+            log_error("Finalizacao de linha ';'");
+            exit(0);
+        }
+    }
+    else
+    {
+        log_error("Variavel: caractere Inicial Nao Esta Entre a..z");
+        exit(0);
+    }
+}
+
+void check_data_length(int type) {
+    if ((int)file_array[char_index] == 91) { // [
+        next_wout_space();
+        while ((int)file_array[char_index] >= 48 && (int)file_array[char_index] <= 57) // 0..9
+        {
+            next_wout_space();
+        }
+
+        if (type == DECIMAL) {
+            if ((int)file_array[char_index] != 46) // ponto
+            {
+                log_error("Variavel: Informe o Separador de Casas Decimais");
+                exit(0);
+            }
+            else
+            {
                 next_wout_space();
             }
 
-            // String final "\0"
-            word[mem+1] = 00;
-
-            save_to_symbtab(word, "inteiro", NULL, scope);  
-
-            if ((int)file_array[char_index] == 44) // ,
+            while ((int)file_array[char_index] >= 48 && (int)file_array[char_index] <= 57) // 0..9
             {
                 next_wout_space();
-                if ((int)file_array[char_index] == 38) // &
-                {
-                    validate_variable(INTEIRO);
-                }
-                else
-                {
-                    log_error("Declaracao de Variavel");
-                    exit(0);
-                }
-            }
+            }    
+        }
+
+        if ((int)file_array[char_index] != 93) { // ]
+            log_error("Variavel: Falta Caractere ']' na Declaracao");
+            exit(0);
         }
         else
         {
-            log_error("Variavel: caractere Inicial Nao Esta Entre a..z");
-            exit(0);
+            next_wout_space();
         }
+    }
+    else
+    {
+        log_error("Variavel: Falta Caractere '[' na Declaracao");
+        exit(0);
     }
 }

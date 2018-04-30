@@ -8,6 +8,8 @@ void verify_caractere();
 
 void validate_variable(int type);
 
+void check_data_length(int type);
+
 extern const char *reserved_words[];
 
 extern char *file_array;

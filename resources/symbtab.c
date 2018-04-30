@@ -27,7 +27,7 @@ void new_symbtab() {
     symbtab_index++; 
 }
 
-void save_to_symbtab(char *token, char *type, char *value, char *scope) {
+void save_to_symbtab(char *token, int type, char *value, char *scope) {
     new_symbtab();
 
     SymbolsTable[symbtab_index-1].token = malloc(sizeof(char*));
@@ -36,7 +36,17 @@ void save_to_symbtab(char *token, char *type, char *value, char *scope) {
 
     SymbolsTable[symbtab_index-1].type = malloc(sizeof(char*));
     control_memory(sizeof(SymbolsTable[symbtab_index-1].type));
-    SymbolsTable[symbtab_index-1].type = type;
+    if (type == INTEIRO) {
+        SymbolsTable[symbtab_index-1].type = "inteiro";
+    }
+    else if (type == CARACTERE)
+    {
+        SymbolsTable[symbtab_index-1].type = "caractere";
+    }
+    else
+    {
+        SymbolsTable[symbtab_index-1].type = "decimal";
+    }
 
     SymbolsTable[symbtab_index-1].value = malloc(sizeof(char*));
     control_memory(sizeof(SymbolsTable[symbtab_index-1].value));

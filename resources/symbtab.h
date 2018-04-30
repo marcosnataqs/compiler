@@ -1,1 +1,1 @@
-void save_to_symbtab(char *token, char *type, char *value, char *scope);
+void save_to_symbtab(char *token, int type, char *value, char *scope);
