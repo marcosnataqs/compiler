@@ -10,6 +10,10 @@ void validate_variable(int type);
 
 void check_data_length(int type);
 
+void verify_funcao();
+
+void check_func_name();
+
 extern const char *reserved_words[];
 
 extern char *file_array;

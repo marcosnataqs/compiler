@@ -34,7 +34,7 @@ void lexic() {
                 verify_caractere();
                 break;
             case 102: // f
-                //TODO: Validar função
+                verify_funcao();
                 break;
         }
     }
@@ -318,6 +318,92 @@ void check_data_length(int type) {
     else
     {
         log_error("Variavel: Falta Caractere '[' na Declaracao");
+        exit(0);
+    }
+}
+
+void verify_funcao() {
+    int mem = 1;
+    char *word;
+
+    // Catch the first word's caracter
+    char_index--;
+
+    word = malloc(mem * sizeof(char));
+    control_memory(sizeof(word));
+
+    for (int i = 0; i < strlen(reserved_words[1]); i++, mem++) // funcao
+    {
+        next_wout_space();
+        word[i] = file_array[char_index];
+        word = (char *) realloc(word, mem * sizeof(char));
+        control_memory(sizeof(word));
+    }
+
+    // String final "\0"
+    word[mem-1] = 00;
+
+    if(strncmp(word, reserved_words[1], strlen(reserved_words[1])) == 0) // funcao
+    {
+        next_wout_space();
+        if ((int)file_array[char_index] == 102) // f
+        {
+            check_func_name();       
+        }
+        else
+        {
+            log_error("Funcao Deve Iniciar com Caractere 'f'");
+            exit(0);
+        }
+    } else {
+        log_error(word);
+        exit(0);
+    }
+
+    control_memory(-sizeof(word));
+    free(word);
+}
+
+void check_func_name() {
+    int mem = 1;
+    char *word;
+
+    word = malloc(mem * sizeof(char));
+    control_memory(sizeof(word));
+
+    while (
+            (int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122 // a..z
+            ||
+            (int)file_array[char_index] >= 65 && (int)file_array[char_index] <= 90 // A..Z
+            ||
+            (int)file_array[char_index] >= 48 && (int)file_array[char_index] <= 57 // 0..9
+        )
+    {
+        word[mem-1] = file_array[char_index];
+        mem++;
+        word = (char *) realloc(word, mem * sizeof(char));
+        control_memory(sizeof(word));
+        next_wout_space();
+    }
+    
+    // String final "\0"
+    word[mem-1] = 00;
+
+    if ((int)file_array[char_index] == 40) // (
+    {
+        log_success(word);
+        if (scope_state)
+        {
+            while ((int)file_array[char_index] != 59) // ;
+            {
+                next_wout_space();
+            }
+        }
+        //TODO: Validação para escopo função
+    }
+    else
+    {
+        log_error("Funcao: Falta Caractere '('");
         exit(0);
     }
 }
