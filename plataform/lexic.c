@@ -65,7 +65,7 @@ void verify_principal() {
     {
         scope = malloc(strlen(reserved_words[0]) * sizeof(char));
         strcpy(scope, reserved_words[0]);
-        log_success("principal Scope");
+        //log_success("principal Scope");
     } else {
         log_error(word);
         exit(0);
@@ -99,7 +99,7 @@ void verify_inteiro() {
 
     if(strncmp(word, reserved_words[7], strlen(reserved_words[7])) == 0) // inteiro
     {
-        log_success("inteiro type");
+        //log_success("inteiro type");
         next_wout_space();
         if ((int)file_array[char_index] == 38) // &
         {
@@ -143,7 +143,7 @@ void verify_decimal() {
 
     if(strncmp(word, reserved_words[9], strlen(reserved_words[9])) == 0) // decimal
     {
-        log_success("decimal type");
+        //log_success("decimal type");
         next_wout_space();
         if ((int)file_array[char_index] == 38) // &
         {
@@ -187,7 +187,7 @@ void verify_caractere() {
 
     if(strncmp(word, reserved_words[8], strlen(reserved_words[8])) == 0) // caractere
     {
-        log_success("caractere type");
+        //log_success("caractere type");
         next_wout_space();
         if ((int)file_array[char_index] == 38) // &
         {
@@ -221,7 +221,9 @@ void validate_variable(int type) {
         word[mem] = file_array[char_index];
         next_wout_space();
         while ((int)file_array[char_index] != 59 
-                && (int)file_array[char_index] != 44 && (int)file_array[char_index] != 91) // ; ou , ou [
+                && (int)file_array[char_index] != 44 
+                && (int)file_array[char_index] != 91
+                && (int)file_array[char_index] != 41) // ; ou , ou [ ou )
         {
             mem++;
             word = (char *) realloc(word, mem * sizeof(char));
@@ -253,25 +255,35 @@ void validate_variable(int type) {
             check_data_length(type);
         }
 
-        save_to_symbtab(word, type, NULL, scope);  
+        save_to_symbtab(word, type, NULL, scope);
 
-        if ((int)file_array[char_index] == 44) // ,
-        {
-            next_wout_space();
-            if ((int)file_array[char_index] == 38) // &
+        if (scope_state) { // Inside a scope
+            if ((int)file_array[char_index] == 44) // ,
             {
-                validate_variable(INTEIRO);
+                next_wout_space();
+                if ((int)file_array[char_index] == 38) // &
+                {
+                    validate_variable(type);
+                }
+                else
+                {
+                    log_error("Declaracao de Variavel");
+                    exit(0);
+                }
             }
-            else
+            else if ((int)file_array[char_index] != 59) // ;
             {
-                log_error("Declaracao de Variavel");
+                log_error("Finalizacao de linha ';'");
                 exit(0);
             }
         }
-        else if ((int)file_array[char_index] != 59) // ;
+        else // Outside a scope
         {
-            log_error("Finalizacao de linha ';'");
-            exit(0);
+            if ((int)file_array[char_index] == 44) // ,
+            {
+                next_wout_space();
+                check_parameters();
+            }
         }
     }
     else
@@ -389,9 +401,13 @@ void check_func_name() {
     // String final "\0"
     word[mem-1] = 00;
 
+    if (scope_state == 0 && strcmp(word, scope) != 0) { // Scope change
+        strcpy(scope, word);
+        //log_success(scope);
+    }
+
     if ((int)file_array[char_index] == 40) // (
     {
-        log_success(word);
         if (scope_state)
         {
             while ((int)file_array[char_index] != 59) // ;
@@ -399,11 +415,40 @@ void check_func_name() {
                 next_wout_space();
             }
         }
-        //TODO: Validação para escopo função
+        else
+        {
+            next_wout_space();
+            check_parameters();
+
+            if ((int)file_array[char_index] != 41) // )
+            {
+                log_error("Funcao: Falta Caractere ')'");
+            }
+        }
     }
     else
     {
         log_error("Funcao: Falta Caractere '('");
+        exit(0);
+    }
+}
+
+void check_parameters() {
+    if ((int)file_array[char_index] >= 105) // i
+    {
+        verify_inteiro();
+    }
+    else if ((int)file_array[char_index] >= 100) // d
+    {
+        verify_decimal();
+    }
+    else if ((int)file_array[char_index] >= 99) // c
+    {
+        verify_caractere();
+    }
+    else
+    {
+        log_error("Tipo de Dados Invalido");
         exit(0);
     }
 }

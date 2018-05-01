@@ -52,18 +52,22 @@ void save_to_symbtab(char *token, int type, char *value, char *scope) {
     control_memory(sizeof(SymbolsTable[symbtab_index-1].value));
     SymbolsTable[symbtab_index-1].value = value;
 
-    SymbolsTable[symbtab_index-1].scope = malloc(sizeof(char*));
+    SymbolsTable[symbtab_index-1].scope = malloc(sizeof(char));
     control_memory(sizeof(SymbolsTable[symbtab_index-1].scope));
     SymbolsTable[symbtab_index-1].scope = scope;
+    //TODO: Verificar erro do escopo
 }
 
 void print_symbtab() {
+    printf("-----------------------------------------------\n");
+    printf("|   Token   |   Tipo   |   Valor   |  Escopo  |\n");
     for (int i = 0; i < symbtab_index; i++)
     {
-        printf("\n|%s|%s|%s|%s|", 
+        printf("\n|%11s|%10s|%11s|%10s|\n", 
         SymbolsTable[i].token,
         SymbolsTable[i].type, 
         SymbolsTable[i].value, 
         SymbolsTable[i].scope);
     }
+    printf("-----------------------------------------------\n");
 }

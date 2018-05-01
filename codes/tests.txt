@@ -1,7 +1,7 @@
 principal(){
     inteiro &a,&b;
-    caractere &nome[30];
-    decimal &h[6.2];
+    caractere &nome[30],&sobrenome[30];
+    decimal &h[6.2],&g[6.2];
     funcao fsoma(&a,&b);
 }
 
