@@ -9,7 +9,7 @@ const char *reserved_words[] =
 {
     "principal",
     "funcao",
-    "leitura",
+    "leia",
     "escrita",
     "se",
     "senao",

@@ -10,19 +10,17 @@ void lexic() {
     {
         switch (((int)file_array[char_index]))
         {
-            case 32: // espaço
-                break;
             case 10: // LF
                 line_index++;
-                break;
-            case 112: // p
-                verify_principal();
                 break;
             case 123: // {
                 scope_state = 1;
                 break;
             case 125: // }
                 scope_state = 0;
+                break;
+            case 112: // p
+                verify_principal();
                 break;
             case 105: // i
                 verify_inteiro();
@@ -35,6 +33,9 @@ void lexic() {
                 break;
             case 102: // f
                 verify_funcao();
+                break;
+            case 38: // &
+                check_expression();
                 break;
         }
     }
@@ -65,10 +66,8 @@ void verify_principal() {
     {
         scope = malloc(strlen(reserved_words[0]) * sizeof(char));
         strcpy(scope, reserved_words[0]);
-        //log_success("principal Scope");
     } else {
-        log_error(word);
-        exit(0);
+        log_error(strcat(word, " Erro Palavra Reservada: principal"));
     }
 
     control_memory(-sizeof(word));
@@ -99,7 +98,6 @@ void verify_inteiro() {
 
     if(strncmp(word, reserved_words[7], strlen(reserved_words[7])) == 0) // inteiro
     {
-        //log_success("inteiro type");
         next_wout_space();
         if ((int)file_array[char_index] == 38) // &
         {
@@ -108,11 +106,9 @@ void verify_inteiro() {
         else
         {
             log_error("Declaracao de Variavel");
-            exit(0);
         }
     } else {
-        log_error(word);
-        exit(0);
+        log_error(strcat(word, " Erro Palavra Reservada: inteiro"));
     }
 
     control_memory(-sizeof(word));
@@ -143,7 +139,6 @@ void verify_decimal() {
 
     if(strncmp(word, reserved_words[9], strlen(reserved_words[9])) == 0) // decimal
     {
-        //log_success("decimal type");
         next_wout_space();
         if ((int)file_array[char_index] == 38) // &
         {
@@ -152,11 +147,9 @@ void verify_decimal() {
         else
         {
             log_error("Declaracao de Variavel");
-            exit(0);
         }
     } else {
-        log_error(word);
-        exit(0);
+        log_error(strcat(word, " Erro Palavra Reservada: decimal"));
     }
 
     control_memory(-sizeof(word));
@@ -187,7 +180,6 @@ void verify_caractere() {
 
     if(strncmp(word, reserved_words[8], strlen(reserved_words[8])) == 0) // caractere
     {
-        //log_success("caractere type");
         next_wout_space();
         if ((int)file_array[char_index] == 38) // &
         {
@@ -196,11 +188,9 @@ void verify_caractere() {
         else
         {
             log_error("Declaracao de Variavel");
-            exit(0);
         }
     } else {
-        log_error(word);
-        exit(0);
+        log_error(strcat(word, " Erro Palavra Reservada: caractere"));
     }
 
     control_memory(-sizeof(word));
@@ -242,7 +232,6 @@ void validate_variable(int type) {
             else
             {
                 log_error("Variavel: Caractere Invalido");
-                exit(0);
             }
             
             next_wout_space();
@@ -268,13 +257,11 @@ void validate_variable(int type) {
                 else
                 {
                     log_error("Declaracao de Variavel");
-                    exit(0);
                 }
             }
             else if ((int)file_array[char_index] != 59) // ;
             {
                 log_error("Finalizacao de linha ';'");
-                exit(0);
             }
         }
         else // Outside a scope
@@ -289,7 +276,6 @@ void validate_variable(int type) {
     else
     {
         log_error("Variavel: caractere Inicial Nao Esta Entre a..z");
-        exit(0);
     }
 }
 
@@ -305,7 +291,6 @@ void check_data_length(int type) {
             if ((int)file_array[char_index] != 46) // ponto
             {
                 log_error("Variavel: Informe o Separador de Casas Decimais");
-                exit(0);
             }
             else
             {
@@ -320,7 +305,6 @@ void check_data_length(int type) {
 
         if ((int)file_array[char_index] != 93) { // ]
             log_error("Variavel: Falta Caractere ']' na Declaracao");
-            exit(0);
         }
         else
         {
@@ -330,7 +314,6 @@ void check_data_length(int type) {
     else
     {
         log_error("Variavel: Falta Caractere '[' na Declaracao");
-        exit(0);
     }
 }
 
@@ -365,11 +348,9 @@ void verify_funcao() {
         else
         {
             log_error("Funcao Deve Iniciar com Caractere 'f'");
-            exit(0);
         }
     } else {
         log_error(word);
-        exit(0);
     }
 
     control_memory(-sizeof(word));
@@ -402,8 +383,8 @@ void check_func_name() {
     word[mem-1] = 00;
 
     if (scope_state == 0 && strcmp(word, scope) != 0) { // Scope change
+        scope = malloc(strlen(word) * sizeof(char));
         strcpy(scope, word);
-        //log_success(scope);
     }
 
     if ((int)file_array[char_index] == 40) // (
@@ -429,7 +410,6 @@ void check_func_name() {
     else
     {
         log_error("Funcao: Falta Caractere '('");
-        exit(0);
     }
 }
 
@@ -449,6 +429,17 @@ void check_parameters() {
     else
     {
         log_error("Tipo de Dados Invalido");
-        exit(0);
+    }
+}
+
+void check_expression() {
+    next_wout_space();
+    if ((int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122) // a..z
+    {
+        //TODO: Validar atribuições e expressões
+    }
+    else
+    {
+        log_error("Variavel: caractere Inicial Nao Esta Entre a..z");
     }
 }

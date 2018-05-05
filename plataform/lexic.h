@@ -16,6 +16,8 @@ void check_func_name();
 
 void check_parameters();
 
+void check_expression();
+
 extern const char *reserved_words[];
 
 extern char *file_array;
