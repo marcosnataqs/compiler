@@ -24,6 +24,8 @@ void verify_leia();
 
 void exist_principal();
 
+void verify_se();
+
 extern const char *reserved_words[];
 
 extern char *file_array;

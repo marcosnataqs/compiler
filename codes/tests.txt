@@ -1,4 +1,4 @@
-funcao fteste(){
+principal(){
     inteiro &a,&b;
     caractere &nome[30],&sobrenome[30];
     decimal &h[6.2],&g[6.2];
@@ -13,4 +13,14 @@ funcao fsoma(inteiro &c, inteiro &f){
 
     escrita(&e);
     leia(&h);
+
+    se(&a==1) &a=2;
+    senao {
+        &a=3;
+    }
+
+    para(&a=&b; &a<=10; &a++) {
+        escrita (&a);
+        escrita (“Texto”);
+    }
 }

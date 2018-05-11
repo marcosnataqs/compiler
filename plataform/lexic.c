@@ -20,7 +20,7 @@ void lexic() {
                 scope_state = 0;
                 break;
             case 112: // p
-                verify_principal();
+                verify_principal(); //TODO: Criar validação "PARA"
                 break;
             case 105: // i
                 verify_inteiro();
@@ -42,6 +42,9 @@ void lexic() {
                 break;
             case 108: // l
                 verify_leia();
+                break;
+            case 115: // s
+                verify_se(); //TODO: Criar validação "SENAO"
                 break;
         }
     }
@@ -390,6 +393,11 @@ void check_func_name() {
     // String final "\0"
     word[mem-1] = 00;
 
+    // If principal function not in the begininng
+    if (char_index <= 20) {
+        scope = malloc(sizeof(char));
+    }
+
     if (scope_state == 0 && strcmp(word, scope) != 0) { // Scope change
         scope = malloc(strlen(word) * sizeof(char));
         strcpy(scope, word);
@@ -422,21 +430,24 @@ void check_func_name() {
 }
 
 void check_parameters() {
-    if ((int)file_array[char_index] >= 105) // i
+    if ((int)file_array[char_index] != 41) // )
     {
-        verify_inteiro();
-    }
-    else if ((int)file_array[char_index] >= 100) // d
-    {
-        verify_decimal();
-    }
-    else if ((int)file_array[char_index] >= 99) // c
-    {
-        verify_caractere();
-    }
-    else
-    {
-        log_error("Tipo de Dados Invalido");
+        if ((int)file_array[char_index] >= 105) // i
+        {
+            verify_inteiro();
+        }
+        else if ((int)file_array[char_index] >= 100) // d
+        {
+            verify_decimal();
+        }
+        else if ((int)file_array[char_index] >= 99) // c
+        {
+            verify_caractere();
+        }
+        else
+        {
+            log_error("Tipo de Dados Invalido");
+        }
     }
 }
 
@@ -524,4 +535,34 @@ void exist_principal() {
             log_error("Nao Existe Funcao Principal Declarada");
         }
     }
+}
+
+void verify_se() {
+    int mem = 1;
+    char *word;
+
+    // Catch the first word's caracter
+    char_index--;
+
+    word = malloc(mem * sizeof(char));
+    control_memory(sizeof(word));
+
+    for (int i = 0; i < strlen(reserved_words[4]); i++, mem++) // se
+    {
+        next_wout_space();
+        word[i] = file_array[char_index];
+        word = (char *) realloc(word, mem * sizeof(char));
+        control_memory(sizeof(word));
+    }
+
+    // String final "\0"
+    word[mem-1] = 00;
+
+    if(strncmp(word, reserved_words[4], strlen(reserved_words[4])) != 0) // se
+    {
+        log_error(strcat(word, " Erro Palavra Reservada: se"));
+    }
+
+    control_memory(-sizeof(word));
+    free(word);
 }
