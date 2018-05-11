@@ -37,8 +37,16 @@ void lexic() {
             case 38: // &
                 check_expression();
                 break;
+            case 101: // e
+                verify_escrita();
+                break;
+            case 108: // l
+                verify_leia();
+                break;
         }
     }
+
+    exist_principal();
 };
 
 void verify_principal() {
@@ -441,5 +449,79 @@ void check_expression() {
     else
     {
         log_error("Variavel: caractere Inicial Nao Esta Entre a..z");
+    }
+}
+
+void verify_escrita() {
+    int mem = 1;
+    char *word;
+
+    // Catch the first word's caracter
+    char_index--;
+
+    word = malloc(mem * sizeof(char));
+    control_memory(sizeof(word));
+
+    for (int i = 0; i < strlen(reserved_words[3]); i++, mem++) // escrita
+    {
+        next_wout_space();
+        word[i] = file_array[char_index];
+        word = (char *) realloc(word, mem * sizeof(char));
+        control_memory(sizeof(word));
+    }
+
+    // String final "\0"
+    word[mem-1] = 00;
+
+    if(strncmp(word, reserved_words[3], strlen(reserved_words[3])) != 0) // escrita
+    {
+        log_error(strcat(word, " Erro Palavra Reservada: escrita"));
+    }
+
+    control_memory(-sizeof(word));
+    free(word);
+}
+
+void verify_leia() {
+    int mem = 1;
+    char *word;
+
+    // Catch the first word's caracter
+    char_index--;
+
+    word = malloc(mem * sizeof(char));
+    control_memory(sizeof(word));
+
+    for (int i = 0; i < strlen(reserved_words[2]); i++, mem++) // leia
+    {
+        next_wout_space();
+        word[i] = file_array[char_index];
+        word = (char *) realloc(word, mem * sizeof(char));
+        control_memory(sizeof(word));
+    }
+
+    // String final "\0"
+    word[mem-1] = 00;
+
+    if(strncmp(word, reserved_words[2], strlen(reserved_words[2])) != 0) // leia
+    {
+        log_error(strcat(word, " Erro Palavra Reservada: leia"));
+    }
+
+    control_memory(-sizeof(word));
+    free(word);
+}
+
+void exist_principal() {
+    for (int i = 0; i < symbtab_index; i++)
+    {
+        if(strncmp(SymbolsTable[i].scope, reserved_words[0], strlen(reserved_words[0])) == 0) // principal
+        {
+            break;
+        }
+        else
+        {
+            log_error("Nao Existe Funcao Principal Declarada");
+        }
     }
 }

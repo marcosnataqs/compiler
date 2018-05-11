@@ -23,7 +23,7 @@ int main(void)
 
     print_symbtab();
 
-    printf("\n\nAllocated Memory: %zu bytes\n\n", allocated);
+    printf("\n\nMemoria -> Maximo Alocado: %zu bytes\n\n", max_allocated);
 
     return 0;
 }

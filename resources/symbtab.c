@@ -55,7 +55,6 @@ void save_to_symbtab(char *token, int type, char *value, char *scope) {
     SymbolsTable[symbtab_index-1].scope = malloc(sizeof(char));
     control_memory(sizeof(SymbolsTable[symbtab_index-1].scope));
     SymbolsTable[symbtab_index-1].scope = scope;
-    //TODO: Verificar erro do escopo
 }
 
 void print_symbtab() {

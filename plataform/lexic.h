@@ -18,6 +18,12 @@ void check_parameters();
 
 void check_expression();
 
+void verify_escrita();
+
+void verify_leia();
+
+void exist_principal();
+
 extern const char *reserved_words[];
 
 extern char *file_array;
