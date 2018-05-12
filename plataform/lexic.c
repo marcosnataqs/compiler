@@ -20,7 +20,7 @@ void lexic() {
                 scope_state = 0;
                 break;
             case 112: // p
-                verify_principal(); //TODO: Criar validação "PARA"
+                verify_principal();
                 break;
             case 105: // i
                 verify_inteiro();
@@ -44,7 +44,7 @@ void lexic() {
                 verify_leia();
                 break;
             case 115: // s
-                verify_se(); //TODO: Criar validação "SENAO"
+                verify_se();
                 break;
         }
     }

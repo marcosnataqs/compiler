@@ -18,9 +18,4 @@ funcao fsoma(inteiro &c, inteiro &f){
     senao {
         &a=3;
     }
-
-    para(&a=&b; &a<=10; &a++) {
-        escrita (&a);
-        escrita (“Texto”);
-    }
 }
