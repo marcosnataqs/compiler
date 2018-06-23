@@ -70,3 +70,11 @@ void print_symbtab() {
     }
     printf("-----------------------------------------------\n");
 }
+
+void free_all_memory() {
+    control_memory(-sizeof(file_array));
+    free(file_array);
+
+    control_memory(-sizeof(SymbolsTable));
+    free(SymbolsTable);
+}

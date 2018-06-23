@@ -50,10 +50,12 @@ void lexic() {
     }
 
     exist_principal();
+    check_balance();
 };
 
 void verify_principal() {
     int mem = 1;
+    int pos_ant = 0;
     char *word;
 
     // Catch the first word's caracter
@@ -61,6 +63,8 @@ void verify_principal() {
 
     word = malloc(mem * sizeof(char));
     control_memory(sizeof(word));
+
+    pos_ant = char_index;
 
     for (int i = 0; i < strlen(reserved_words[0]); i++, mem++) // principal
     {
@@ -78,7 +82,28 @@ void verify_principal() {
         scope = malloc(strlen(reserved_words[0]) * sizeof(char));
         strcpy(scope, reserved_words[0]);
     } else {
-        log_error(strcat(word, " Erro Palavra Reservada: principal"));
+        control_memory(-sizeof(word));
+        free(word);
+        word = malloc(mem * sizeof(char));
+        control_memory(sizeof(word));
+        char_index = pos_ant;
+        mem = 1;
+        
+        for (int i = 0; i < strlen(reserved_words[6]); i++, mem++) // para
+        {
+            next_wout_space();
+            word[i] = file_array[char_index];
+            word = (char *) realloc(word, mem * sizeof(char));
+            control_memory(sizeof(word));
+        }
+
+        // String final "\0"
+        word[mem-1] = 00;
+
+        if(strncmp(word, reserved_words[6], strlen(reserved_words[6])) != 0) // para
+        {
+            log_error("Erro Palavra Reservada"); 
+        }
     }
 
     control_memory(-sizeof(word));
@@ -119,7 +144,7 @@ void verify_inteiro() {
             log_error("Declaracao de Variavel");
         }
     } else {
-        log_error(strcat(word, " Erro Palavra Reservada: inteiro"));
+        log_error(strcat(word, " Erro Palavra Reservada"));
     }
 
     control_memory(-sizeof(word));
@@ -160,7 +185,7 @@ void verify_decimal() {
             log_error("Declaracao de Variavel");
         }
     } else {
-        log_error(strcat(word, " Erro Palavra Reservada: decimal"));
+        log_error(strcat(word, " Erro Palavra Reservada"));
     }
 
     control_memory(-sizeof(word));
@@ -201,7 +226,7 @@ void verify_caractere() {
             log_error("Declaracao de Variavel");
         }
     } else {
-        log_error(strcat(word, " Erro Palavra Reservada: caractere"));
+        log_error(strcat(word, " Erro Palavra Reservada"));
     }
 
     control_memory(-sizeof(word));
@@ -486,7 +511,7 @@ void verify_escrita() {
 
     if(strncmp(word, reserved_words[3], strlen(reserved_words[3])) != 0) // escrita
     {
-        log_error(strcat(word, " Erro Palavra Reservada: escrita"));
+        log_error(strcat(word, " Erro Palavra Reservada"));
     }
 
     control_memory(-sizeof(word));
@@ -516,7 +541,7 @@ void verify_leia() {
 
     if(strncmp(word, reserved_words[2], strlen(reserved_words[2])) != 0) // leia
     {
-        log_error(strcat(word, " Erro Palavra Reservada: leia"));
+        log_error(strcat(word, " Erro Palavra Reservada"));
     }
 
     control_memory(-sizeof(word));
@@ -524,25 +549,31 @@ void verify_leia() {
 }
 
 void exist_principal() {
+    int exist = 0;
+
     for (int i = 0; i < symbtab_index; i++)
     {
         if(strncmp(SymbolsTable[i].scope, reserved_words[0], strlen(reserved_words[0])) == 0) // principal
         {
-            break;
+            exist = 1;
         }
-        else
-        {
-            log_error("Nao Existe Funcao Principal Declarada");
-        }
+    }
+
+    if (exist != 1)
+    {
+        log_error("Nao Existe Funcao Principal Declarada");
     }
 }
 
 void verify_se() {
     int mem = 1;
+    int pos_ant = 0;
     char *word;
 
     // Catch the first word's caracter
     char_index--;
+
+    pos_ant = char_index;
 
     word = malloc(mem * sizeof(char));
     control_memory(sizeof(word));
@@ -560,9 +591,90 @@ void verify_se() {
 
     if(strncmp(word, reserved_words[4], strlen(reserved_words[4])) != 0) // se
     {
-        log_error(strcat(word, " Erro Palavra Reservada: se"));
+        log_error(strcat(word, " Erro Palavra Reservada"));
+    }
+    
+    next_wout_space();
+
+    if ((int)file_array[char_index] != 40) // (
+    {
+        control_memory(-sizeof(word));
+        free(word);
+        word = malloc(mem * sizeof(char));
+        control_memory(sizeof(word));
+        char_index = pos_ant;
+        mem = 1;
+        
+        for (int i = 0; i < strlen(reserved_words[5]); i++, mem++) // senao
+        {
+            next_wout_space();
+            word[i] = file_array[char_index];
+            word = (char *) realloc(word, mem * sizeof(char));
+            control_memory(sizeof(word));
+        }
+
+        // String final "\0"
+        word[mem-1] = 00;
+
+        if(strncmp(word, reserved_words[5], strlen(reserved_words[5])) != 0) // senao
+        {
+            log_error(strcat(word, " Erro Palavra Reservada")); 
+        }
     }
 
     control_memory(-sizeof(word));
     free(word);
+}
+
+void check_balance()
+{
+    int i;
+    int abre = 0;
+    int fecha = 0;
+
+    for(i = 0; i <= strlen(file_array); i++)
+    {
+        if((int)file_array[i] == 40) // (
+        {
+            abre++;
+        }
+    }
+
+    for(i = 0; i <= strlen(file_array); i++)
+    {
+        if((int)file_array[i] == 41) // )
+        {
+            fecha++;
+        }
+    }
+
+    if (abre != fecha)
+    {
+        printf("\n|ERROR| Duplo Balanceamento: Parenteses\n\n");
+        exit(0);
+    }
+
+    abre = fecha = 0;
+
+    for(i = 0; i <= strlen(file_array); i++)
+    {
+        if((int)file_array[i] == 123) // {
+        {
+            abre++;
+        }
+    }
+
+    for(i = 0; i <= strlen(file_array); i++)
+    {
+        if((int)file_array[i] == 125) // }
+        {
+            fecha++;
+        }
+    }
+
+    if (abre != fecha)
+    {
+        printf("\n|ERROR| Duplo Balanceamento: Chaves\n\n");
+        exit(0);
+    }
 }

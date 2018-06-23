@@ -25,5 +25,7 @@ int main(void)
 
     printf("\n\nMemoria -> Maximo Alocado: %zu bytes\n\n", max_allocated);
 
+    free_all_memory();
+
     return 0;
 }

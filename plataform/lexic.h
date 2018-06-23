@@ -26,6 +26,8 @@ void exist_principal();
 
 void verify_se();
 
+void check_balance();
+
 extern const char *reserved_words[];
 
 extern char *file_array;
