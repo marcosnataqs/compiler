@@ -5,7 +5,7 @@
 #include "resources/utils.c"
 #include "resources/logs.c"
 #include "resources/symbtab.c"
-#include "plataform/lexic.c"
+#include "plataform/analyzer.c"
 
 int main(void) 
 {
@@ -16,8 +16,8 @@ int main(void)
 
     printf("\nIniciando analise do arquivo...");
 
-    /*Lexic Parsing*/
-    lexic();
+    /*Code Parsing*/
+    analyzer();
 
     printf("\nAnalise realizada com sucesso!\n");
 

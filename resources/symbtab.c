@@ -58,9 +58,11 @@ void save_to_symbtab(char *token, int type, char *value, char *scope) {
 }
 
 void print_symbtab() {
+    int i;
+
     printf("-----------------------------------------------\n");
     printf("|   Token   |   Tipo   |   Valor   |  Escopo  |\n");
-    for (int i = 0; i < symbtab_index; i++)
+    for (i = 0; i < symbtab_index; i++)
     {
         printf("\n|%11s|%10s|%11s|%10s|\n", 
         SymbolsTable[i].token,

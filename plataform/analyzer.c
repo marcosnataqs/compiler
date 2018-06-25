@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "lexic.h"
+#include "analyzer.h"
 
-void lexic() {
+void analyzer() {
     char_index = 0;
+
+    check_balance();
+    check_finisher();
 
     for (char_index; char_index <= strlen(file_array); char_index++) 
     {
@@ -46,16 +49,20 @@ void lexic() {
             case 115: // s
                 verify_se();
                 break;
+            case 34:
+                check_aspas();
+                break;
         }
     }
 
     exist_principal();
-    check_balance();
 };
 
 void verify_principal() {
+    int i;
     int mem = 1;
     int pos_ant = 0;
+    int count_virg = 0;
     char *word;
 
     // Catch the first word's caracter
@@ -66,7 +73,7 @@ void verify_principal() {
 
     pos_ant = char_index;
 
-    for (int i = 0; i < strlen(reserved_words[0]); i++, mem++) // principal
+    for (i = 0; i < strlen(reserved_words[0]); i++, mem++) // principal
     {
         next_wout_space();
         word[i] = file_array[char_index];
@@ -89,7 +96,7 @@ void verify_principal() {
         char_index = pos_ant;
         mem = 1;
         
-        for (int i = 0; i < strlen(reserved_words[6]); i++, mem++) // para
+        for (i = 0; i < strlen(reserved_words[6]); i++, mem++) // para
         {
             next_wout_space();
             word[i] = file_array[char_index];
@@ -104,6 +111,27 @@ void verify_principal() {
         {
             log_error("Erro Palavra Reservada"); 
         }
+        else
+        {
+            next_wout_space();
+            if( (int)file_array[char_index] == 40 ) // (
+            {
+                next_wout_space();
+                while( (int)file_array[char_index] != 41 ) // )
+                {
+                    if( (int)file_array[char_index] == 59 ) // vírgula
+                    {
+                        count_virg++;
+                    }
+                    next_wout_space();
+                }
+            }
+
+            if( count_virg != 2 )
+            {
+                log_error("Laço de repetição: Para");
+            }
+        }
     }
 
     control_memory(-sizeof(word));
@@ -111,6 +139,7 @@ void verify_principal() {
 };
 
 void verify_inteiro() {
+    int i;
     int mem = 1;
     char *word;
 
@@ -120,7 +149,7 @@ void verify_inteiro() {
     word = malloc(mem * sizeof(char));
     control_memory(sizeof(word));
 
-    for (int i = 0; i < strlen(reserved_words[7]); i++, mem++) // inteiro
+    for (i = 0; i < strlen(reserved_words[7]); i++, mem++) // inteiro
     {
         next_wout_space();
 
@@ -152,6 +181,7 @@ void verify_inteiro() {
 }
 
 void verify_decimal() {
+    int i;
     int mem = 1;
     char *word;
 
@@ -161,7 +191,7 @@ void verify_decimal() {
     word = malloc(mem * sizeof(char));
     control_memory(sizeof(word));
 
-    for (int i = 0; i < strlen(reserved_words[9]); i++, mem++) // decimal
+    for (i = 0; i < strlen(reserved_words[9]); i++, mem++) // decimal
     {
         next_wout_space();
 
@@ -193,6 +223,7 @@ void verify_decimal() {
 }
 
 void verify_caractere() {
+    int i;
     int mem = 1;
     char *word;
 
@@ -202,7 +233,7 @@ void verify_caractere() {
     word = malloc(mem * sizeof(char));
     control_memory(sizeof(word));
 
-    for (int i = 0; i < strlen(reserved_words[8]); i++, mem++) // caractere
+    for (i = 0; i < strlen(reserved_words[8]); i++, mem++) // caractere
     {
         next_wout_space();
 
@@ -280,7 +311,14 @@ void validate_variable(int type) {
             check_data_length(type);
         }
 
-        save_to_symbtab(word, type, NULL, scope);
+        if ( exist_variable(word) == 1 )
+        {
+            log_error("Variável já declarada");
+        }
+        else
+        {
+            save_to_symbtab(word, type, NULL, scope);
+        }
 
         if (scope_state) { // Inside a scope
             if ((int)file_array[char_index] == 44) // ,
@@ -354,6 +392,7 @@ void check_data_length(int type) {
 }
 
 void verify_funcao() {
+    int i;
     int mem = 1;
     char *word;
 
@@ -363,7 +402,7 @@ void verify_funcao() {
     word = malloc(mem * sizeof(char));
     control_memory(sizeof(word));
 
-    for (int i = 0; i < strlen(reserved_words[1]); i++, mem++) // funcao
+    for (i = 0; i < strlen(reserved_words[1]); i++, mem++) // funcao
     {
         next_wout_space();
         word[i] = file_array[char_index];
@@ -489,6 +528,7 @@ void check_expression() {
 }
 
 void verify_escrita() {
+    int i;
     int mem = 1;
     char *word;
 
@@ -498,7 +538,7 @@ void verify_escrita() {
     word = malloc(mem * sizeof(char));
     control_memory(sizeof(word));
 
-    for (int i = 0; i < strlen(reserved_words[3]); i++, mem++) // escrita
+    for (i = 0; i < strlen(reserved_words[3]); i++, mem++) // escrita
     {
         next_wout_space();
         word[i] = file_array[char_index];
@@ -516,9 +556,60 @@ void verify_escrita() {
 
     control_memory(-sizeof(word));
     free(word);
+
+    next_wout_space();
+    if( (int)file_array[char_index] == 40 ) // (
+    {
+        do
+        {
+            next_wout_space();
+            if( (int)file_array[char_index] == 38 ) // &
+            {
+                mem = 1;
+                word = malloc(mem * sizeof(char));
+                control_memory(sizeof(word));
+
+                word[mem-1] = file_array[char_index];
+
+                next_wout_space();
+
+                while (
+                    (int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122 // a..z
+                    ||
+                    (int)file_array[char_index] >= 65 && (int)file_array[char_index] <= 90 // A..Z
+                    ||
+                    (int)file_array[char_index] >= 48 && (int)file_array[char_index] <= 57 // 0..9
+                    )
+                {
+                    mem++;
+                    word = (char *) realloc(word, mem * sizeof(char));
+                    control_memory(sizeof(word));
+                    word[mem-1] = file_array[char_index];
+                    next_wout_space();
+                }
+
+                // String final "\0"
+                word[mem] = 00;
+
+                if ( exist_variable(word) == 0 )
+                {
+                    log_error("Variável não declarada anteriormente");
+                }
+
+                control_memory(-sizeof(word));
+                free(word);
+            }
+            else if( (int)file_array[char_index] == 34 ) // aspas
+            {
+                check_aspas();
+                next_wout_space();
+            }
+        } while( (int)file_array[char_index] == 44 || (int)file_array[char_index] == 43 ); // vírgula, Mais
+    }
 }
 
 void verify_leia() {
+    int i;
     int mem = 1;
     char *word;
 
@@ -528,7 +619,7 @@ void verify_leia() {
     word = malloc(mem * sizeof(char));
     control_memory(sizeof(word));
 
-    for (int i = 0; i < strlen(reserved_words[2]); i++, mem++) // leia
+    for (i = 0; i < strlen(reserved_words[2]); i++, mem++) // leia
     {
         next_wout_space();
         word[i] = file_array[char_index];
@@ -546,12 +637,58 @@ void verify_leia() {
 
     control_memory(-sizeof(word));
     free(word);
+
+    next_wout_space();
+    if( (int)file_array[char_index] == 40 ) // (
+    {
+        do
+        {
+            next_wout_space();
+            if( (int)file_array[char_index] == 38 ) // &
+            {
+                mem = 1;
+                word = malloc(mem * sizeof(char));
+                control_memory(sizeof(word));
+
+                word[mem-1] = file_array[char_index];
+
+                next_wout_space();
+
+                while (
+                    (int)file_array[char_index] >= 97 && (int)file_array[char_index] <= 122 // a..z
+                    ||
+                    (int)file_array[char_index] >= 65 && (int)file_array[char_index] <= 90 // A..Z
+                    ||
+                    (int)file_array[char_index] >= 48 && (int)file_array[char_index] <= 57 // 0..9
+                    )
+                {
+                    mem++;
+                    word = (char *) realloc(word, mem * sizeof(char));
+                    control_memory(sizeof(word));
+                    word[mem-1] = file_array[char_index];
+                    next_wout_space();
+                }
+
+                // String final "\0"
+                word[mem] = 00;
+
+                if ( exist_variable(word) == 0 )
+                {
+                    log_error("Variável não declarada anteriormente");
+                }
+
+                control_memory(-sizeof(word));
+                free(word);
+            }   
+        } while( (int)file_array[char_index] == 44 ); // vírgula
+    }
 }
 
 void exist_principal() {
+    int i;
     int exist = 0;
 
-    for (int i = 0; i < symbtab_index; i++)
+    for (i = 0; i < symbtab_index; i++)
     {
         if(strncmp(SymbolsTable[i].scope, reserved_words[0], strlen(reserved_words[0])) == 0) // principal
         {
@@ -566,6 +703,7 @@ void exist_principal() {
 }
 
 void verify_se() {
+    int i;
     int mem = 1;
     int pos_ant = 0;
     char *word;
@@ -578,7 +716,7 @@ void verify_se() {
     word = malloc(mem * sizeof(char));
     control_memory(sizeof(word));
 
-    for (int i = 0; i < strlen(reserved_words[4]); i++, mem++) // se
+    for (i = 0; i < strlen(reserved_words[4]); i++, mem++) // se
     {
         next_wout_space();
         word[i] = file_array[char_index];
@@ -605,7 +743,7 @@ void verify_se() {
         char_index = pos_ant;
         mem = 1;
         
-        for (int i = 0; i < strlen(reserved_words[5]); i++, mem++) // senao
+        for (i = 0; i < strlen(reserved_words[5]); i++, mem++) // senao
         {
             next_wout_space();
             word[i] = file_array[char_index];
@@ -631,6 +769,7 @@ void check_balance()
     int i;
     int abre = 0;
     int fecha = 0;
+    int counter = 0;
 
     for(i = 0; i <= strlen(file_array); i++)
     {
@@ -677,4 +816,111 @@ void check_balance()
         printf("\n|ERROR| Duplo Balanceamento: Chaves\n\n");
         exit(0);
     }
+
+    abre = fecha = 0;
+
+    for(i = 0; i <= strlen(file_array); i++)
+    {
+        if((int)file_array[i] == 91) // [
+        {
+            abre++;
+        }
+    }
+
+    for(i = 0; i <= strlen(file_array); i++)
+    {
+        if((int)file_array[i] == 93) // ]
+        {
+            fecha++;
+        }
+    }
+
+    if (abre != fecha)
+    {
+        printf("\n|ERROR| Duplo Balanceamento: Colchetes\n\n");
+        exit(0);
+    }
+
+    for(i = 0; i <= strlen(file_array); i++)
+    {
+        if((int)file_array[i] == 39) // '
+        {
+            counter++;
+        }
+    }
+
+    if (counter % 2 != 0)
+    {
+        printf("\n|ERROR| Duplo Balanceamento: Aspas Simples\n\n");
+        exit(0);
+    }
+
+    counter = 0;
+
+    for(i = 0; i <= strlen(file_array); i++)
+    {
+        if((int)file_array[i] == 34) // "
+        {
+            counter++;
+        }
+    }
+
+    if (counter % 2 != 0)
+    {
+        printf("\n|ERROR| Duplo Balanceamento: Aspas Duplas\n\n");
+        exit(0);
+    }
+
+}
+
+void check_finisher()
+{
+    int i;
+    int back;
+
+    for(i = 0; i <= strlen(file_array); i++)
+    {
+        if((int)file_array[i] == 10) // LF
+        {
+            back = i;
+
+            while( (int)file_array[i] == 00 || (int)file_array[i] == 32 || (int)file_array[i] == 10 )
+            {
+                i--;
+            }
+
+            if( (int)file_array[i] != 59 && (int)file_array[i] != 123 && (int)file_array[i] != 125 )
+            {
+                printf("\n|ERROR| Finalização de linha\n\n");
+                exit(0);
+            }
+
+            i = back;
+        }
+    }
+}
+
+void check_aspas()
+{
+    next_wout_space();
+    while((int)file_array[char_index] != 34) // aspas
+    {
+        next_wout_space();
+    }
+}
+
+int exist_variable(char *word)
+{
+    int i;
+    int exist = 0;
+
+    for (i = 0; i < symbtab_index; i++)
+    {
+        if(strncmp(SymbolsTable[i].token, word, strlen(word)) == 0)
+        {
+            exist = 1;
+        }
+    }
+
+    return exist;
 }

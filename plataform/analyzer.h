@@ -28,6 +28,12 @@ void verify_se();
 
 void check_balance();
 
+void check_finisher();
+
+void check_aspas();
+
+int exist_variable(char *word);
+
 extern const char *reserved_words[];
 
 extern char *file_array;
